@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "baseUrl": "./",
+    "paths": {
+      "@auth/*":["./src/auth/*"],
+      "@common/*":["./src/common/*"],
+      "@config/*":["./src/config/*"],
+      "@public/*":["./public/*"],
+      "@test/*":["./test/*"],
+      "@src/*":["./src/*"]
+    }
+  },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs"
+  }
+}
