@@ -1,47 +1,61 @@
 import { EnumToString } from '../../common/helpers';
-import { IsString, IsInt, IsDate, MaxLength, IsEmail, IsOptional, Min, Max, IsEnum, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsDate,
+  MaxLength,
+  IsEmail,
+  IsOptional,
+  Min,
+  Max,
+  IsEnum,
+  IsArray,
+  IsBoolean
+} from 'class-validator';
 import { AppRoles } from 'src/app.roles';
+import { PartialType } from '@nestjs/swagger';
 
 /**
  * @ysp0lur
  * @author Raul E. Aguirre H.
- * 
+ *
  */
 export class CreateUserDto {
+  @IsString()
+  @MaxLength(30)
+  user: string;
 
-    @IsString()
-    @MaxLength(30)
-    user: string;
+  @IsString()
+  @MaxLength(150)
+  name: string;
 
-    @IsString()
-    @MaxLength(150)
-    name: string;
+  @IsString()
+  @MaxLength(150)
+  lastName: string;
 
-    @IsString()
-    @MaxLength(150)
-    lastName: string;
+  @IsEmail()
+  @MaxLength(150)
+  email: string;
 
-    @IsEmail()
-    @MaxLength(150)
-    email: string;
+  @IsString()
+  @MaxLength(255)
+  password: string;
 
-    @IsString()
-    @MaxLength(255)
-    password: string;
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  tel: string;
 
-    @IsOptional()
-    @IsString()
-    @MaxLength(20)
-    tel: string;
+  @IsOptional()
+  @IsBoolean()
+  status: boolean;
 
-    @IsOptional()
-    @IsBoolean()
-    status: boolean;
-
-    @IsArray()
-    @IsEnum(AppRoles, {
-        each: true,
-        message: `must be a valid role value, ${ EnumToString(AppRoles) }`,
-    })
-    roles: string[];
+  @IsArray()
+  @IsEnum(AppRoles, {
+    each: true,
+    message: `must be a valid role value, ${EnumToString(AppRoles)}`
+  })
+  roles: string[];
 }
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
