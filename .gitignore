@@ -1,10 +1,17 @@
-#environments
-.env.development
-.env.production
+.env.*
+!.env.example
+
+#configs
+ormconfig.json
+
+#Docker
+docker-compose.yml
 
 # compiled output
 /dist
 /node_modules
+/postgres_data
+/pgadmin
 
 # Logs
 logs

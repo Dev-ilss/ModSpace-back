@@ -1,65 +1,31 @@
 import { roles } from './app.roles';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DatabaseModule } from './database/database.module';
 import { AccessControlModule } from 'nest-access-control';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import {
-  DATABASE_HOST,
-  DATABASE_PORT,
-  DATABASE_USERNAME,
-  DATABASE_PASSWORD,
-  DATABASE_NAME,
-  DATABASE_LOGGING,
-  DATABASE_CONNECTIONLIMIT,
-  DATABASE_CONNECTTIMEOUT,
-  UPLOAD_IMAGE
-} from './config';
+import * as Joi from '@hapi/joi';
+import config from './config/database.config';
 import { Module, CacheModule, CacheInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MulterModule } from '@nestjs/platform-express';
+import { UPLOAD_IMAGE } from '@config/constants.config';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        host: config.get<string>(DATABASE_HOST),
-        port: parseInt(config.get<string>(DATABASE_PORT)),
-        username: config.get<string>(DATABASE_USERNAME),
-        password: config.get<string>(DATABASE_PASSWORD),
-        database: config.get<string>(DATABASE_NAME),
-        autoLoadEntities: true,
-        synchronize: true,
-        logging: config.get<string>(DATABASE_LOGGING) == 'true',
-        logger: 'file',
-        entities: [__dirname + './**/**/*.entity{.ts,.js}'],
-        migrations: [__dirname + './**/**/*.migration{.ts,.js}'],
-        subscribers: [__dirname + './**/**/*.subscriber{.ts,.js}'],
-        extra: {
-          connectionLimit: parseInt(config.get<string>(DATABASE_CONNECTIONLIMIT)),
-          connectTimeout: parseInt(config.get<string>(DATABASE_CONNECTTIMEOUT))
-        },
-        cli: {
-          entitiesDir: 'dist/entities',
-          migrationsDir: 'dist/migrations',
-          subscribersDir: 'dist/subscribers'
-        }
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // .env.development
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string().valid('development', 'production').default('development')
       })
     }),
-    ConfigModule.forRoot({
-      envFilePath: '.env.development',
-      // envFilePath: '.env.production',
-      expandVariables: true,
-      isGlobal: true
-    }),
-    // MulterModule.register({
-    //   dest: '/register',
-    // }),
     AccessControlModule.forRoles(roles),
+    DatabaseModule,
     AuthModule,
     UserModule,
     CacheModule.register(),
@@ -68,7 +34,8 @@ import { MulterModule } from '@nestjs/platform-express';
       useFactory: async (config: ConfigService) => ({
         dest: config.get<string>(UPLOAD_IMAGE)
       })
-    })
+    }),
+    GameModule
   ],
   controllers: [AppController],
   providers: [

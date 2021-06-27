@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, EditUserDto, ResponseUserDto } from './dtos';
 import { Auth, User } from 'src/common/decorators';
@@ -6,6 +6,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { AppResource } from 'src/app.roles';
 import { UserEntity } from './entities';
+import { classToPlain } from 'class-transformer';
+import { ParseIntPipe } from '@common/pipes/parse-int.pipe';
 
 @ApiTags('Users')
 @Controller('users')
@@ -16,17 +18,18 @@ export class UserController {
     private readonly rolesBuilder: RolesBuilder
   ) {}
 
-  // @Auth({
-  //     possession: 'any',
-  //     action: 'read',
-  //     resource: AppResource.USER
-  // })
+  @Auth({
+    possession: 'any',
+    action: 'read',
+    resource: AppResource.USER
+  })
   @Get()
   async getUsers(): Promise<any> {
     const data = await this.userService.getUsers();
     return {
-      success: true,
-      data
+      error: false,
+      data: classToPlain(data),
+      message: ''
     };
   }
 
@@ -39,8 +42,9 @@ export class UserController {
   async getUser(@Param('id') id: number): Promise<ResponseUserDto> {
     const data = await this.userService.getUser(id);
     return {
-      success: true,
-      data
+      error: false,
+      data: classToPlain(data),
+      message: ''
     };
   }
 
@@ -53,8 +57,9 @@ export class UserController {
   async createUser(@Body() dto: CreateUserDto): Promise<ResponseUserDto> {
     const data = await this.userService.createUser(dto);
     return {
-      success: true,
-      data
+      error: false,
+      data: classToPlain(data),
+      message: ''
     };
   }
 
@@ -78,8 +83,9 @@ export class UserController {
       data = await this.userService.editUser(id, dto, user);
     }
     return {
-      success: true,
-      data
+      error: false,
+      data: classToPlain(data),
+      message: ''
     };
   }
 
@@ -92,14 +98,30 @@ export class UserController {
   async deleteUser(@Param('id') id: number, @User() user: UserEntity): Promise<any> {
     if (this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted) {
       //Administrator
-      await this.userService.deleteUser(id);
+      await this.userService.remove(id);
     } else {
       // Client
-      await this.userService.deleteUser(id, user);
+      await this.userService.remove(id);
     }
     return {
-      success: true,
+      error: false,
+      data: classToPlain([]),
       message: 'User deleted'
+    };
+  }
+
+  @Auth({
+    possession: 'any',
+    action: 'create',
+    resource: AppResource.USER
+  })
+  @Patch('recover/:id')
+  async recover(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.userService.recover(id);
+    return {
+      error: false,
+      data: classToPlain(data),
+      message: ''
     };
   }
 }

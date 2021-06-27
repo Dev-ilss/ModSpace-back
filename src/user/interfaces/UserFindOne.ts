@@ -1,4 +1,4 @@
 export interface UserFindOne {
-    id?: number;
-    email?: string;
+  id?: number;
+  email?: string;
 }

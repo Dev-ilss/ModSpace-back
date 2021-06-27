@@ -8,7 +8,7 @@ import { INestApplication } from '@nestjs/common';
 *@example initSwagger(app)
 */
 export const initSwagger = (app: INestApplication): any => {
-    const swaggerConfig = new DocumentBuilder()
+  const swaggerConfig = new DocumentBuilder()
     .setTitle('API Documentation')
     .setDescription('API documentation for Dev-ilss platform (Dev-ilss Group)')
     .setVersion('0.1.0')
@@ -17,23 +17,21 @@ export const initSwagger = (app: INestApplication): any => {
     // .setBasePath('api/v1/')
     .build();
 
-    const document = SwaggerModule.createDocument(app, swaggerConfig, {
-        ignoreGlobalPrefix: false,
-    });
+  const document = SwaggerModule.createDocument(app, swaggerConfig, {
+    ignoreGlobalPrefix: false
+  });
 
-    SwaggerModule.setup('api/v1/docs', app, document, {
-        explorer: true,
-        customCss: `
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    explorer: true,
+    customCss: `
           .topbar-wrapper img {content:url(\'/assets/img/documentationdevils.png\'); width:150px; height:150px;}
           .swagger-ui .topbar { background-color: #85D5FD; }`,
-        customSiteTitle: 'Dev-ilss API Documentation',
-        customfavIcon: '/assets/img/favicon.png',
-        swaggerOptions: {
-        filter: true,
-        showRequestDuration: true,
-        ignoreGlobalPrefix: false,
-        },
-    });
-}
-
-
+    customSiteTitle: 'Dev-ilss API Documentation',
+    customfavIcon: '/assets/img/favicon.png',
+    swaggerOptions: {
+      filter: true,
+      showRequestDuration: true,
+      ignoreGlobalPrefix: false
+    }
+  });
+};

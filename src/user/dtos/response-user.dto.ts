@@ -1,5 +1,5 @@
-import { UserEntity } from '../entities';
 export class ResponseUserDto {
-    success: boolean;
-    data?: UserEntity;
+  error: boolean;
+  data?: Record<string, any>;
+  message: string;
 }

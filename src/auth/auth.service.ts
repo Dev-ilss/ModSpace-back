@@ -6,29 +6,25 @@ import { UserEntity } from '../user/entities';
 
 @Injectable()
 export class AuthService {
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
-    constructor(
-        private readonly userService: UserService,
-        private readonly jwtService: JwtService
-    ){}
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.userService.findUser({ email });
 
-    async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.userService.findUser({ email });
-
-        if(user && await compare(password, user.password) && user.status) {
-            const { password, ...rest } = user;
-            return rest;
-        }
-        return null;
+    if (user && (await compare(password, user.password)) && user.status) {
+      const { password, ...rest } = user;
+      return rest;
     }
+    return null;
+  }
 
-    async login(data: UserEntity){
-        const {id} = data;
-        const payload = { sub: id };
+  async login(data: UserEntity) {
+    const { id } = data;
+    const payload = { sub: id };
 
-        return {
-            data,
-            accessToken: this.jwtService.sign(payload),
-        };
-    }
+    return {
+      data,
+      accessToken: this.jwtService.sign(payload)
+    };
+  }
 }

@@ -1,5 +1,16 @@
-import { PrimaryGeneratedColumn, Column, Index, Entity, BeforeInsert, BeforeUpdate } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  Entity,
+  BeforeInsert,
+  BeforeUpdate,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn
+} from 'typeorm';
 import { hash } from 'bcryptjs';
+import { Exclude } from 'class-transformer';
 
 /**
  * @author Raul E. Aguirre H.
@@ -9,6 +20,7 @@ import { hash } from 'bcryptjs';
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
+  @Index()
   id: number;
 
   @Column({ type: 'varchar', length: '30', nullable: true, default: null })
@@ -34,6 +46,18 @@ export class UserEntity {
 
   @Column({ type: 'simple-array' })
   roles: string[];
+
+  @Exclude()
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Exclude()
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
+  @Exclude()
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+  deletedAt: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

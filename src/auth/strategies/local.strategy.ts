@@ -4,19 +4,17 @@ import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from './../auth.service';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy){
-    constructor(
-        private readonly authService: AuthService
-    ){
-        super({
-            usernameField: 'email',
-            passwordField: 'password'
-        })
-    }
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private readonly authService: AuthService) {
+    super({
+      usernameField: 'email',
+      passwordField: 'password'
+    });
+  }
 
-    async validate(email: string, password: string){
-         const user = await this.authService.validateUser(email, password);
-         if(!user) throw new UnauthorizedException('Login user or password does not match');
-         return user;
-    }
+  async validate(email: string, password: string) {
+    const user = await this.authService.validateUser(email, password);
+    if (!user) throw new UnauthorizedException('Login user or password does not match');
+    return user;
+  }
 }

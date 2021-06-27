@@ -69,4 +69,20 @@ export class UserService {
   async findUser(data: UserFindOne): Promise<any> {
     return await this.userRepository.createQueryBuilder('user').where(data).addSelect('user.password').getOne();
   }
+
+  async remove(id: number) {
+    const user = await this.userRepository.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.userRepository.softRemove(user);
+  }
+
+  async recover(id: number) {
+    const user = await this.userRepository.findOne({ where: { id }, withDeleted: true });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.userRepository.recover(user);
+  }
 }
