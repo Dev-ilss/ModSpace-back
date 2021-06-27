@@ -13,7 +13,7 @@ export class UserService {
   ) {}
 
   async getUsers(): Promise<UserEntity[]> {
-    const data = await this.userRepository.find();
+    const data = await this.userRepository.find({ relations: ['games'] });
     if (data.length == 0) {
       throw new NotFoundException('Users not found');
     }
@@ -22,7 +22,7 @@ export class UserService {
 
   async getUser(id: number, userEntity?: UserEntity): Promise<UserEntity> {
     const user = await this.userRepository
-      .findOne(id)
+      .findOne(id, { relations: ['games'] })
       .then((user) => (!userEntity ? user : !!user && userEntity.id === user.id ? user : null));
     if (!user) {
       throw new NotFoundException('User does not exists or unauthorized');

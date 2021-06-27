@@ -1,3 +1,4 @@
+import { GameEntity } from './../../game/entities/game.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -7,7 +8,8 @@ import {
   BeforeUpdate,
   CreateDateColumn,
   DeleteDateColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  OneToMany
 } from 'typeorm';
 import { hash } from 'bcryptjs';
 import { Exclude } from 'class-transformer';
@@ -40,6 +42,9 @@ export class UserEntity {
 
   @Column({ type: 'varchar', length: '20', nullable: true, default: null })
   tel: string;
+
+  @OneToMany(() => GameEntity, (game) => game.user, { cascade: true, nullable: true })
+  games: GameEntity[];
 
   @Column({ nullable: true, default: null })
   status: boolean;

@@ -7,26 +7,26 @@ export enum AppRoles {
 
 export enum AppResource {
   USER = 'USER',
-  POST = 'POST'
+  GAME = 'GAME'
 }
 
 export const roles: RolesBuilder = new RolesBuilder();
 
 roles
-  // POST Roles
+  // CLIENT Roles
   .grant(AppRoles.CLIENT)
   .readOwn([AppResource.USER])
   .updateOwn([AppResource.USER])
   .deleteOwn([AppResource.USER])
-  .readOwn([AppResource.POST])
-  .createOwn([AppResource.POST])
-  .updateOwn([AppResource.POST])
-  .deleteOwn([AppResource.POST])
+  .readOwn([AppResource.GAME])
+  .createOwn([AppResource.GAME])
+  .updateOwn([AppResource.GAME])
+  .deleteOwn([AppResource.GAME])
 
   // Admin Roles
   .grant(AppRoles.ADMIN)
   .extend(AppRoles.CLIENT)
-  .readAny([AppResource.POST, AppResource.USER])
-  .createAny([AppResource.POST, AppResource.USER])
-  .updateAny([AppResource.POST, AppResource.USER])
-  .deleteAny([AppResource.POST, AppResource.USER]);
+  .readAny([AppResource.GAME, AppResource.USER])
+  .createAny([AppResource.GAME, AppResource.USER])
+  .updateAny([AppResource.GAME, AppResource.USER])
+  .deleteAny([AppResource.GAME, AppResource.USER]);
