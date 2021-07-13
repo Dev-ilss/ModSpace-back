@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Patch } from '@nestjs/
 import { UserService } from './user.service';
 import { CreateUserDto, EditUserDto, ResponseUserDto } from './dtos';
 import { Auth, User } from 'src/common/decorators';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { AppResource } from 'src/app.roles';
 import { UserEntity } from './entities';
@@ -24,6 +24,7 @@ export class UserController {
     resource: AppResource.USER
   })
   @Get()
+  @ApiOperation({ summary: 'Administration' })
   async getUsers(): Promise<any> {
     const data = await this.userService.getUsers();
     return {
@@ -95,6 +96,7 @@ export class UserController {
     resource: AppResource.USER
   })
   @Delete(':id')
+  @ApiOperation({ summary: 'Administration' })
   async deleteUser(@Param('id') id: number, @User() user: UserEntity): Promise<any> {
     if (this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted) {
       //Administrator
@@ -116,6 +118,7 @@ export class UserController {
     resource: AppResource.USER
   })
   @Patch('recover/:id')
+  @ApiOperation({ summary: 'Administration' })
   async recover(@Param('id', ParseIntPipe) id: number) {
     const data = await this.userService.recover(id);
     return {

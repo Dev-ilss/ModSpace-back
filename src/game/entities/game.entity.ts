@@ -30,6 +30,9 @@ export class GameEntity {
   @Column({ name: 'image_name', type: 'varchar', length: '50', nullable: false })
   imageName: string;
 
+  @Column({ name: 'image_path', type: 'varchar', length: '250', nullable: false })
+  imagePath: string;
+
   @ManyToOne(() => UserEntity, (user) => user.games)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;

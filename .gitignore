@@ -8,6 +8,7 @@ ormconfig.json
 docker-compose.yml
 
 # compiled output
+/uploads
 /dist
 /node_modules
 /postgres_data

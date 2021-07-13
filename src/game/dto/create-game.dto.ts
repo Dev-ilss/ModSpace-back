@@ -17,6 +17,12 @@ export class CreateGameDto {
   @MaxLength(50)
   @ApiProperty()
   readonly imageName: string;
+  
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(250)
+  @ApiProperty()
+  readonly imagePath: string;
 }
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {}

@@ -9,16 +9,21 @@ import {
   HttpStatus,
   HttpException,
   Put,
-  Request
+  Request,
+  UploadedFile,
+  UseInterceptors,
+  Res
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto/create-game.dto';
 import { Auth } from '@common/decorators';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { AppResource } from '@src/app.roles';
 import { classToPlain } from 'class-transformer';
 import { ParseIntPipe } from '@common/pipes/parse-int.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { optionsUploadImage } from '@config/multer.config';
 
 @ApiTags('Games')
 @Controller('games')
@@ -35,6 +40,7 @@ export class GameController {
     resource: AppResource.GAME
   })
   @Get()
+  @ApiOperation({ summary: 'Administration' })
   async findAllGamesAdmin() {
     const data = await this.gameService.findAll();
     return {
@@ -70,6 +76,7 @@ export class GameController {
     resource: AppResource.GAME
   })
   @Get(':id')
+  @ApiOperation({ summary: 'Administration' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const data = await this.gameService.findOne(id);
     return {
@@ -97,12 +104,43 @@ export class GameController {
 
   @Auth({
     possession: 'own',
+    action: 'read',
+    resource: AppResource.GAME
+  })
+  @Get('picture/:imageId')
+  async serveImage(@Param('imageId') imageId: string, @Res() res): Promise<any> {
+    res.sendFile(imageId, { root: 'uploads/images'});
+  }
+
+  @Auth({
+    possession: 'own',
     action: 'create',
     resource: AppResource.GAME
   })
   @Post()
-  async create(@Body() createGameDto: CreateGameDto, @Request() req) {
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        description: { type: 'integer' },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('image', optionsUploadImage))
+  async create(@Request() req, @UploadedFile() file: Express.Multer.File) {
     const { id } = req.user;
+    const createGameDto: CreateGameDto = {
+      title: req.body.title,
+      description: req.body.description,
+      imageName: file.originalname,
+      imagePath: file.filename
+    }
     const data = await this.gameService.create(createGameDto, id).catch((err) => {
       throw new HttpException(
         {
@@ -142,6 +180,7 @@ export class GameController {
     resource: AppResource.GAME
   })
   @Delete(':id')
+  @ApiOperation({ summary: 'Administration' })
   async deleteUser(@Param('id') id: number): Promise<any> {
     const data = await this.gameService.remove(id);
     return {
@@ -157,6 +196,7 @@ export class GameController {
     resource: AppResource.GAME
   })
   @Patch('recover/:id')
+  @ApiOperation({ summary: 'Administration' })
   async recover(@Param('id', ParseIntPipe) id: number) {
     const data = await this.gameService.recover(id);
     return {
